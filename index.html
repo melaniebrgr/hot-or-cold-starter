@@ -2,17 +2,13 @@
 <html lang="en">
 	<head>
 		<title>Hot || Cold</title>
-		<!-- Meta Tags -->
 		<meta charset="utf-8"/>
-		<!-- Stylesheets -->
 		<link rel="stylesheet" href="styles/reset.css">
 		<link href='//fonts.googleapis.com/css?family=Lato:400,700,900,900italic' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" href="styles/style.css"/> 
 	</head>
 	<body>
 		
-		<header> <!--Header -->
-
+		<header>
 			<!-- Top Navigation -->
 			<nav> 
 				<ul class="clearfix">
@@ -20,7 +16,6 @@
 					<li><a class="new" href="#">+ New Game</a></li>
 				</ul>
 			</nav>
-			
 			<!-- Modal Information Box -->
 			<div class="overlay" id="modal">
 				<div class="content">
@@ -37,27 +32,17 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- logo text -->
 			<h1>HOT or COLD</h1>
-
 		</header>
 
-		<section class="game"> <!-- Guessing Section -->
-			
+		<section class="game">
 			<h2 id="feedback">Make your Guess!</h2>
-
 			<form>
 				<input type="text" name="userGuess" id="userGuess" class="text" maxlength="3" autocomplete="off" placeholder="Enter your Guess" required/>
       			<input type="submit" id="guessButton" class="button" name="submit" value="Guess"/>
 			</form>
-			
       		<p>Guess #<span id="count">0</span>!</p>
-			
-			<ul id="guessList" class="guessBox clearfix">
-
-			</ul>
-
+			<ul id="guessList" class="guessBox clearfix"></ul>
 		</section>
 		<!-- JavaScript -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

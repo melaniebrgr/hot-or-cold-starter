@@ -1,164 +1,109 @@
-//initialize variables
-'use strict';
-var secretNumber, 
-userGuess, 
-pastGuesses = [], 
-count,
-guessHtml, 
-userFeedback,
-alreadyGuessed,
-newButton,
-form ,
-input,
-feedback,
-countElement,
-guessList;
+"strict mode";
 
-$(document).ready(pageLoad);
+var ranNum, numberOfGuesses = 0;
 
- function pageLoad(){
-	
-	/*--- Display information modal box ---*/
-  	$('.what').click(function(){
-    	$('.overlay').fadeIn(1000);
+function handleOverlay() {
+	// Display modal
+  	$(".what").click( function(){
+    	$(".overlay").fadeIn(1000);
   	});
-  	/*--- Hide information modal box ---*/
-  	$('a.close').click(function(){
-  		$('.overlay').fadeOut(1000);
+  	// Hide modal
+  	$("a.close").click( function(){
+  		$(".overlay").fadeOut(1000);
   	});
-
-  	//fetch dom objects
-  	newButton = $('a.new');
-  	form = $('form');
-  	input = form.find('#userGuess');
-  	feedback = $('#feedback');
-  	countElement = $('#count');
-  	guessList = $('#guessList');
-
-    //page load
-    newGame();
-    //event handlers
-    form.submit(function(event){
-      event.preventDefault();
-      getUserGuess();
-    });
-    newButton.click(newGame);
 }
 
-//new game function
-function newGame(){
-	form.find('input[type=submit]').css('opacity','1');
-	resetVariables();
-	render();
-	generateNumber();
-}
-
-//get the user guess
-function getUserGuess(){
-	//get the user guess
-	userGuess = input.val();
-	//reset input value
-	input.val('');
-	//focus on input for next guess
-	input.focus();
-	//ensure valid input
-	if(checkGuess()){return ;}
-	//generate feedback
-	generateFeedback();
-	//track the past user guesses
-	trackGuess();
-	//increment the count
-	guessCount();
-	//render changes to the page
-	render();
-}
-
-  	//check for valid input
-  	function checkGuess(){
-  		if(userGuess % 1 !== 0){
-  			alert('please input a number');
-  			return true;
-  		}
-  		if(userGuess < 0 || userGuess > 101){
-  			alert('please choose a number between zero and 100');
-  			return true;
-  		}
-  		if(pastGuesses.length > 0){
-			$.each(pastGuesses,function(guess,value){
-				if(userGuess == value){
-					alreadyGuessed = true;
-				}
-			}); 
-		}
-		if(alreadyGuessed){
-			alreadyGuessed = false;
-			alert('You guessed this number already');
-			return true;
-		}
-    return false;
+function getFeedback( ranNum, userNum ) {
+	// take the generated number and number guessed by the user
+	// if user > 51 away, return "ice cold"
+	// if between 31 and 50, cold
+	// if between 21 and 30, warm
+	// if between 11 and 20, hot
+	// if between 1 and 10, very hot
+	var absDiff = Math.abs( userNum - ranNum );
+	if ( userNum === ranNum ) {
+		return "Yup, you got it. Big deal. Start a new game – unless you're afraid.";
 	}
-
-//generate user feedback
-function generateFeedback(){
-	if(secretNumber == userGuess){
-		winner();
-	} else if(Math.abs(secretNumber - userGuess) < 10){
-		userFeedback = 'hot';
-	} else if(Math.abs(secretNumber - userGuess) < 20 && Math.abs(secretNumber - userGuess) > 9){
-		userFeedback = ' Kinda hot';
-	} else if(Math.abs(secretNumber - userGuess) < 30 && Math.abs(secretNumber - userGuess) > 19){
-		userFeedback = 'less than warm';
+	else if ( absDiff <= 10 ) {
+		return "very hot";
+	} else if ( absDiff <= 20 ) {
+		return "hot";
+	} else if ( absDiff <= 30 ) {
+		return "warm";
+	} else if ( absDiff <= 50  ) {
+		return "cold";
 	} else {
-		userFeedback = 'cold';
+		return "ice cold";
 	}
 }
 
-//keep track of the users past guesses
-function trackGuess(){
-	pastGuesses.push(userGuess);
-	guessHtml = '';
-	if(pastGuesses[0].length) {
-		$.each(pastGuesses,function(guess,value){
-			guessHtml += '<li>' + value + '</li>';
-		});
-	}
+function displayFeedback( feedback ) {
+	// set feedback to appear in div#feedback
+	$('h2#feedback').text( feedback );
 }
 
-//keep track of guess count
-function guessCount(){
-	count++;
+function displayNumberOfGuesses( guesses ) {
+	// set number of guesses in span#count
+	$('span#count').text( guesses );
 }
 
-	//page render function
-function render(){
-	guessList.html(guessHtml);
-	countElement.html(count);
-	feedback.html(userFeedback);
+function displayGuess( guessNum ) {
+	// add each guessed number as an <li> to ul#guessList
+	$('ul#guessList').append('<li>' + guessNum + '</li>');
 }
 
-function winner(){
-	userFeedback = 'You Won. Click new game to play again';
-	form.find('input[type=submit]').css('opacity','0');
-}
-  	
-//generate secret number
-function generateNumber(){
-	secretNumber = Math.floor(Math.random()*100)+1;
+function incrementGuess() {
+	numberOfGuesses++;
 }
 
-//reset variable 
-function resetVariables(){
-	count = 0;
-	pastGuesses = [];
-	guessHtml='';
-	userGuess = '';
-	userFeedback = 'Make your Guess!';
+function handleGuess() {
+	// ensure that users provide valid inputs
+	// ensure that the user has supplied a numeric input between 1 and 100
+	$('form').submit( function(e) {
+		e.preventDefault();
+			
+		var guessNum = parseInt( $(this).find('input#userGuess').val() );
+		if ( guessNum%1 !== 0 && guessNum > 100 && guessNum < 0 ) { 
+			alert("Enter a number between 1 and 100, idiot.");
+		} else {
+			// check how hot or cold it is, and display
+			displayFeedback( getFeedback(ranNum, guessNum) );
+			// update number of guesses
+			incrementGuess();
+			displayNumberOfGuesses( numberOfGuesses );
+			// update guess list
+			displayGuess( guessNum );
+			//clear guess
+			$(this).find('input#userGuess').val('');
+		}
+	});
 }
-  	
-  	
 
-  
+function generateRandomNumber() {
+	//return a random number between 1 and 100
+	return Math.floor(Math.random() * 101);
+}
 
+function newGame() {
+	//do everything necessary to start a new game
+	// generate a new guess number
+	// clear number of guesses
+	// clear guess list
+	ranNum = generateRandomNumber();
+	console.log("The number is " + ranNum + ", cheater.");
+	$('h2#feedback').text( 'Make your Guess!' );
+	$('span#count').text( '0' );
+	$('ul#guessList').empty();
+}
 
+function handleStartNewGame() {
+	//attach handler on button click, start a new game
+	$('li .new').click( newGame );
+}
 
-
+$(document).ready(function(){
+	newGame();
+	handleStartNewGame();
+	handleGuess();
+	handleOverlay();
+});
