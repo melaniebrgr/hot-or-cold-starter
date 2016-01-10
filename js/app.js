@@ -56,6 +56,10 @@ function incrementGuess() {
 	numberOfGuesses++;
 }
 
+function clearGuess() {
+	$('form input#userGuess').val('');
+}
+
 function handleGuess() {
 	// ensure that users provide valid inputs
 	// ensure that the user has supplied a numeric input between 1 and 100
@@ -63,8 +67,12 @@ function handleGuess() {
 		e.preventDefault();
 			
 		var guessNum = parseInt( $(this).find('input#userGuess').val() );
-		if ( guessNum%1 !== 0 && guessNum > 100 && guessNum < 0 ) { 
-			alert("Enter a number between 1 and 100, idiot.");
+		if ( guessNum%1 !== 0 ) { 
+			alert("Enter a number, idiot.");
+			clearGuess();
+		} else if ( guessNum > 100 || guessNum < 0 ) {
+			alert("It has to be between 1 and 100, moron.");
+			clearGuess();
 		} else {
 			// check how hot or cold it is, and display
 			displayFeedback( getFeedback(ranNum, guessNum) );
@@ -74,7 +82,7 @@ function handleGuess() {
 			// update guess list
 			displayGuess( guessNum );
 			//clear guess
-			$(this).find('input#userGuess').val('');
+			clearGuess();
 		}
 	});
 }
@@ -90,6 +98,7 @@ function newGame() {
 	// clear number of guesses
 	// clear guess list
 	ranNum = generateRandomNumber();
+	numberOfGuesses = 0;
 	console.log("The number is " + ranNum + ", cheater.");
 	$('h2#feedback').text( 'Make your Guess!' );
 	$('span#count').text( '0' );
